@@ -1,165 +1,233 @@
-import 'dart:developer';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:tic_tac_toe_game/game_provider.dart';
+import 'package:tic_tac_toe_game/theme_provider.dart';
 
-class GameScreen extends StatefulWidget {
+class GameScreen extends StatelessWidget {
   final String title;
   const GameScreen({super.key, required this.title});
 
   @override
-  State<GameScreen> createState() => _GameScreenState();
-}
-
-class _GameScreenState extends State<GameScreen> {
-      List<String> gameBoard = List.filled(9, '', growable: false);
-    String currentValue = 'X';
-
-    bool checkWinner() {
-      const ifWinningWenMatch = [
-        [0, 1, 2],
-        [3, 4, 5],
-        [6, 7, 8],
-        [0, 3, 6],
-        [1, 4, 7],
-        [2, 5, 8],
-        [0, 4, 8],
-        [6, 4, 2]
-      ];
-
-      for (var value in ifWinningWenMatch) {
-        if (gameBoard[value[0]] == gameBoard[value[1]] &&
-            gameBoard[value[1]] == gameBoard[value[2]] &&
-            gameBoard[value[0]] != '') {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    void handleUserTap(int index) {
-      if (gameBoard[index] == '') {
-        setState(() {
-          gameBoard[index] = currentValue;
-          if (checkWinner()) {
-            gameBoard = List.filled(9, '', growable: false);
-            showGeneralDialog(
-              context: context,
-              barrierDismissible: false,
-              barrierLabel: 'Dismiss', 
-              transitionDuration: Duration(milliseconds: 300),
-              pageBuilder: (context, animation, secondaryAnimation) {
-              return Center(
-                child: Material(
-                  color: Colors.transparent,
-                  child: Container(
-                    margin: EdgeInsets.all(18.0),
-                    padding: EdgeInsets.all(18.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12)
+  Widget build(BuildContext context) {
+    final gameProvider = Provider.of<GameProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              spacing: 14,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.headlineMedium,
                     ),
-                    child: Column(
-                       mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      spacing: 18,
+                    GestureDetector(
+                      onTap: ()=>themeProvider.toggleTheme(),
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                            color: Colors.white54, shape: BoxShape.circle),
+                        child: Icon(themeProvider.isDarkMode ? Icons.sunny : Icons.nightlight),
+                      ),
+                    )
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 30,
+                  children: [
+                    Column(
                       children: [
-                        Text('Player $currentValue is the winner! 🏆',style: TextStyle(fontSize: 24,fontWeight: FontWeight.w600),),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                icon: Icon(
-                                  Icons.cancel,
-                                  size: 20,
-                                  color: Colors.black,
-                                ),
-                                style: OutlinedButton.styleFrom(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 16),
-                                  side: const BorderSide(color: Colors.grey),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                onPressed: (){
-                                Navigator.pop(context);
-                                },
-                                label: Text(
-                                  'Restart',
-                                  style:
-                                      Theme.of(context).textTheme.titleMedium,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red.shade400,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 16),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                onPressed: () {
-                                  exit(0);
-                                },
-                                child: Text(
-                                  'Exit',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium!
-                                      .copyWith(color: Colors.white),
-                                ),
-                              ),
-                            ),
-                          ],
+                        Container(
+                          width: 78,
+                          height: 78,
+                          decoration: BoxDecoration(
+                              color: gameProvider.currentValue == 'X'
+                                  ? Colors.white
+                                  : Colors.white38,
+                              shape: BoxShape.circle),
+                          child: Icon(
+                            Icons.account_circle,
+                            size: 60,
+                            color: Colors.red,
+                          ),
                         ),
+                        Text(
+                          "Player 1",
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelLarge!
+                              .copyWith(
+                                  fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        Text(
+                          gameProvider.xWinCount.toString(),
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelLarge!
+                              .copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                  color: Colors.red),
+                        )
                       ],
                     ),
-                  ),
+                    Column(
+                      children: [
+                        Container(
+                          width: 78,
+                          height: 78,
+                          decoration: BoxDecoration(
+                              color: gameProvider.currentValue == 'O'
+                                  ? Colors.white
+                                  : Colors.white38,
+                              shape: BoxShape.circle),
+                          child: Icon(
+                            Icons.account_circle_outlined,
+                            size: 60,
+                            color: Colors.green,
+                          ),
+                        ),
+                        Text(
+                          "Player 2",
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelLarge!
+                              .copyWith(
+                                  fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        Text(
+                          gameProvider.oWinCount.toString(),
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelLarge!
+                              .copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                  color: Colors.green),
+                        )
+                      ],
+                    ),
+                  ],
                 ),
-              );
-            },);
-          } else {
-            currentValue = currentValue == 'X' ? '0' : 'X';
-          }
-        });
-      }
-    }
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          GridView.builder(
-            shrinkWrap: true,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3, mainAxisSpacing: 4.0, crossAxisSpacing: 4.0),
-            itemCount: gameBoard.length,
-            itemBuilder: (context, index) {
-              return InkWell(
-                onTap: () {
-                  handleUserTap(index);
-                  log(gameBoard[index]);
-                },
-                child: Container(
+                Container(
+                  width: 130,
+                  height: 40,
                   alignment: Alignment.center,
-                  width: 100,
-                  height: 100,
-                  color: Colors.grey.shade100,
+                  decoration: BoxDecoration(
+                    color: Colors.white30,
+                    borderRadius: BorderRadius.circular(100),
+                  ),
                   child: Text(
-                    gameBoard[index],
-                    style: Theme.of(context).textTheme.displayLarge,
+                    "Player ${gameProvider.currentValue == 'X' ? 1 : 2}'s Turn",
+                    style: Theme.of(context)
+                        .textTheme
+                        .labelLarge!
+                        .copyWith(color: Colors.black38, fontSize: 16),
                   ),
                 ),
-              );
-            },
-          )
-        ],
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      childAspectRatio: 1.2,
+                      mainAxisExtent: 100.0,
+                      mainAxisSpacing: 4.0,
+                      crossAxisSpacing: 4.0),
+                  itemCount: gameProvider.gameBoard.length,
+                  itemBuilder: (context, index) {
+                    return InkWell(
+                      onTap: () => gameProvider.handleUserTap(index),
+                      child: Container(
+                        alignment: Alignment.center,
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                            color: Colors.white54,
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 1.6,
+                                  blurStyle: BlurStyle.outer)
+                            ]),
+                        child: Text(
+                          gameProvider.gameBoard[index],
+                          style: Theme.of(context)
+                              .textTheme
+                              .displayLarge!
+                              .copyWith(
+                                  color: gameProvider.gameBoard[index] == "O"
+                                      ? Colors.green
+                                      : Colors.red),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                Visibility(
+                    visible: gameProvider.isGameFinished,
+                    child: Column(
+                      children: [
+                        Text(
+                          gameProvider.winningMessage,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        Text("🎉 Congratulation 🎉",
+                            style: Theme.of(context).textTheme.titleMedium)
+                      ],
+                    )),
+                Row(
+                  spacing: 10,
+                  children: [
+                    Expanded(
+                        child: ElevatedButton.icon(
+                      style: ButtonStyle(
+                          backgroundColor: WidgetStatePropertyAll(Colors.lime),
+                          minimumSize:
+                              WidgetStatePropertyAll(Size(double.infinity, 50)),
+                          shape: WidgetStatePropertyAll(RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadiusGeometry.circular(10)))),
+                      onPressed: () => gameProvider.handleRestartButton(),
+                      label: Text("Restart",
+                          style: Theme.of(context).textTheme.labelLarge),
+                      icon: Icon(
+                        Icons.refresh_outlined,
+                        color: Colors.black,
+                      ),
+                    )),
+                    Expanded(
+                        child: ElevatedButton.icon(
+                      style: ButtonStyle(
+                          minimumSize:
+                              WidgetStatePropertyAll(Size(double.infinity, 50)),
+                          shape: WidgetStatePropertyAll(RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadiusGeometry.circular(10)))),
+                      onPressed: () => gameProvider.handleNewGameButton(),
+                      label: Text(
+                        "New Game",
+                        style: Theme.of(context).textTheme.labelLarge,
+                      ),
+                      icon: Icon(
+                        Icons.add_circle_outline,
+                        color: Colors.black,
+                      ),
+                    ))
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
