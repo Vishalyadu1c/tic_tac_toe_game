@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tic Tac Toe Game',
+      title: 'Tic Tac Toe',
       debugShowCheckedModeBanner: false,
       home: const GameScreen(title: 'Tic-Tac-Toe'),
     );
