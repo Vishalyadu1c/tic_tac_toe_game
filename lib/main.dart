@@ -1,19 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tic_tac_toe_game/game_provider.dart';
-import 'package:tic_tac_toe_game/game_screen.dart';
-import 'package:tic_tac_toe_game/theme_provider.dart';
+
+import 'game_provider.dart';
+import 'game_screen.dart';
+
 
 void main() {
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider(
-        create: (context) => GameProvider(),
-      ),
-      ChangeNotifierProvider(
-        create: (context) => ThemeProvider(),
-      )
-    ],
+  runApp(ChangeNotifierProvider(
+    create: (context) => GameProvider(),
     child: const MyApp(),
   ));
 }
@@ -23,21 +17,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
     return MaterialApp(
       title: 'Tic Tac Toe Game',
       debugShowCheckedModeBanner: false,
-      themeMode: themeProvider.currentTheme,
-      theme: ThemeData(
-        brightness: Brightness.light,
-        primarySwatch: Colors.blue,
-        scaffoldBackgroundColor: Colors.white,
-      ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        primarySwatch: Colors.deepPurple,
-        scaffoldBackgroundColor: Colors.black,
-      ),
       home: const GameScreen(title: 'Tic-Tac-Toe'),
     );
   }
