@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/widgets.dart';
 
@@ -10,7 +9,6 @@ class GameProvider with ChangeNotifier {
   int xWinCount = 0;
   int drowMatchCount = 0;
   bool isGameFinished = false;
-
 
 
   bool checkWinner() {
@@ -37,8 +35,7 @@ class GameProvider with ChangeNotifier {
 
 
   void handleUserTap(int index) {
-    log(checkWinner().toString());
-    if (gameBoard[index] == '') {
+    if (gameBoard[index] == '' && !isGameFinished) {
         if (!isGameFinished) {
           gameBoard[index] = currentValue;
           if (checkWinner()) {
@@ -53,7 +50,13 @@ class GameProvider with ChangeNotifier {
               oWinCount++;
             }
 
-          } else {
+          }
+          else if (!gameBoard.contains('')) {
+            isGameFinished = true;
+            winningMessage = "Match Draw!";
+            drowMatchCount++;
+          }
+          else {
             currentValue = currentValue == 'X' ? 'O' : 'X';
           }
         }
