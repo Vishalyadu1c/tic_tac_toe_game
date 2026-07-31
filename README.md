@@ -2,6 +2,10 @@
 
 A classic Tic-Tac-Toe game built with Flutter. This application allows two players to compete on the same device, featuring a clean UI, score tracking, and responsive state management using the `provider` package.
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Vishalyadu1c/tic_tac_toe_game/main/assets/images/thumbnail.webp" alt="banner" />
+</p>
+
 ## Features
 
 - **Two-Player Gameplay:** Classic X vs. O gameplay for two players.
